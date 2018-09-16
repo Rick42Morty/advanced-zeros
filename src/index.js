@@ -1,22 +1,44 @@
 module.exports = function getZerosCount(number, base) {
   // your implementation
   var zeros = 0;
-  var helper = 1;
   var maxInd = 0;
-  var smallSimp = [2,	3, 5, 7, 11, 13, 17, 19, 23, 29, 31,
-    37, 41,	43,	47,	53,	59,	61,	67,	71, 73,	79,	83,	89,	97,
-    101, 103, 107, 109, 113, 127]
-  // найдем максимальный простой делитель для base
-  for (var i=1; i<=base/2; i++) {
-    if (base%i == 0 && smallSimp.indexOf(i) !== -1) helper = i;
+  var count = 0;  
+  //разложим base на простые множители
+  var simp = [];
+  var pow = [];
+
+  for (var i=2; i <= base; i++) {
+    if (base%i === 0) {
+      count = 0;
+      simp.push(i);
+      while (base%i === 0) {
+        base/=i;
+        count++;
+      }
+      pow.push(count);
+    }
   }
 
-  if(helper == 1) helper = base;
-  //находим, в какой степени helper превзойдет number
-  while (Math.pow(helper,maxInd) < number) {maxInd++}
+  //составляем массив кандидатов в zeros
+  var num = [];
 
-  for (var n = maxInd; n > 0; n--){
-    zeros += Math.floor(number/Math.pow(helper,n));
+  for (i=0; i<simp.length; i++){
+    maxInd = 1;
+
+    while (Math.pow(simp[i], maxInd) < number) maxInd++;
+
+    zeros = 0;
+    for (var n = maxInd; n > 0; n--){
+      zeros += Math.floor(number/Math.pow(simp[i],n));
+    }
+
+    num.push(Math.floor(zeros/pow[i]));
+  }
+
+  zeros = num[0];
+
+  for (i=1; i<num.length; i++){
+    if (zeros > num[i]) zeros = num[i];
   }
 
   return zeros;
